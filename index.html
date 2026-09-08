@@ -131,6 +131,12 @@
     padding:.3rem .2rem; background:var(--surface); overflow:hidden;
   }
   .grid-cell.blank{ background:transparent; border-color:transparent; }
+  .grid-cell.is-past{ opacity:.42; }
+  .grid-cell.is-today{
+    border:1.5px solid var(--ink); background:var(--surface-muted);
+    box-shadow:0 0 0 2px var(--bg), 0 0 0 3.5px var(--ink);
+  }
+  .grid-cell.is-today .grid-date{ color:var(--ink); }
   .grid-date{ font-weight:700; font-size:.7rem; margin-bottom:.2rem; padding-left:.05rem; }
   .grid-period{
     display:flex; align-items:baseline; gap:.1rem;
@@ -348,8 +354,18 @@
     return 'var(--text)';
   }
 
+  const CALENDAR_YEAR = 2026;
+
+  function actualMonth(month, day){
+    // the very first cell of September is actually August 31
+    if (month === 9 && day === 31) return 8;
+    return month;
+  }
+
   function renderGrid(month, data){
     const el = document.getElementById('grid-view');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const header = `<div class="weekday-header">${WEEKDAYS.map(w => `<div>${w}</div>`).join('')}</div>`;
     const weeks = data.weeks.map(week => {
       const cells = week.map(d => {
@@ -369,8 +385,12 @@
               </div>
             ` : '<div class="grid-period grid-period-blank">&nbsp;</div>';
         }
+        const cellDate = new Date(CALENDAR_YEAR, actualMonth(month, d.date) - 1, d.date);
+        let stateClass = '';
+        if (cellDate.getTime() === today.getTime()) stateClass = ' is-today';
+        else if (cellDate.getTime() < today.getTime()) stateClass = ' is-past';
         return `
-          <div class="grid-cell">
+          <div class="grid-cell${stateClass}">
             <div class="grid-date mono">${d.date}</div>
             ${periods}
           </div>
