@@ -1,0 +1,397 @@
+<title>서은지 시간표</title>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#33302B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --bg:#FAF8F3;
+    --surface:#FFFFFF;
+    --surface-muted:#F1ECE1;
+    --border:#E4DFD1;
+    --text:#2B2621;
+    --text-muted:#8B8375;
+    --ink:#33302B;
+    --ink-contrast:#FDFCFA;
+    --grade1:#B45309;
+    --grade5:#047857;
+    --grade6:#1D4ED8;
+    --star:#D97706;
+    --shadow: rgba(43,38,33,0.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B1917;
+      --surface:#242220;
+      --surface-muted:#2B2823;
+      --border:#3A362E;
+      --text:#EDE8DE;
+      --text-muted:#9C9585;
+      --ink:#EDE8DE;
+      --ink-contrast:#1B1917;
+      --grade1:#F59E0B;
+      --grade5:#10B981;
+      --grade6:#60A5FA;
+      --star:#FBBF24;
+      --shadow: rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1917;
+    --surface:#242220;
+    --surface-muted:#2B2823;
+    --border:#3A362E;
+    --text:#EDE8DE;
+    --text-muted:#9C9585;
+    --ink:#EDE8DE;
+    --ink-contrast:#1B1917;
+    --grade1:#F59E0B;
+    --grade5:#10B981;
+    --grade6:#60A5FA;
+    --star:#FBBF24;
+    --shadow: rgba(0,0,0,0.4);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mono{ font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace; font-variant-numeric:tabular-nums; }
+
+  #app{ max-width:720px; margin:0 auto; padding-bottom:2.5rem; }
+
+  /* app bar */
+  .appbar{
+    position:sticky; top:0; z-index:20;
+    background:var(--bg);
+    padding:1rem 1.1rem .7rem;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem;
+    border-bottom:1px solid transparent;
+  }
+  .appbar h1{ margin:0; font-size:1.05rem; font-weight:700; letter-spacing:-.01em; }
+  .appbar p{ margin:.2rem 0 0; font-size:.78rem; color:var(--text-muted); }
+  .print-btn{
+    flex:none; display:flex; align-items:center; gap:.35rem;
+    background:var(--ink); color:var(--ink-contrast);
+    border:none; border-radius:.6rem; padding:.5rem .75rem;
+    font-size:.72rem; font-weight:600; cursor:pointer;
+    font-family:inherit;
+  }
+  .print-btn svg{ width:14px; height:14px; }
+
+  /* month tabs */
+  .tabs{
+    display:flex; gap:.4rem; padding:.3rem 1.1rem .9rem;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    flex:none; font-family:inherit; font-size:.82rem; font-weight:600;
+    padding:.45rem .95rem; border-radius:999px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-muted); cursor:pointer;
+  }
+  .tab.active{ background:var(--ink); color:var(--ink-contrast); border-color:var(--ink); }
+
+  main{ padding:0 .6rem; }
+
+  /* legend */
+  .legend{
+    display:flex; flex-wrap:wrap; gap:.5rem .9rem; align-items:center;
+    margin:1rem .6rem 0; padding-top:.8rem; border-top:1px solid var(--border);
+    font-size:.7rem; color:var(--text-muted);
+  }
+  .legend-item{ display:flex; align-items:center; gap:.35rem; }
+  .dot{ width:.5rem; height:.5rem; border-radius:999px; flex:none; }
+  .legend-note{ width:100%; order:5; }
+
+  /* ===== calendar grid — same structure at every width, sized to fit ===== */
+  .grid-scroller{
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    background:var(--surface); border:1px solid var(--border); border-radius:1rem;
+    padding:.55rem; box-shadow:0 1px 2px var(--shadow);
+  }
+  .weekday-header, .grid-week{
+    display:grid; grid-template-columns:repeat(5, minmax(60px, 1fr));
+    gap:.22rem; min-width:300px;
+  }
+  .weekday-header{
+    text-align:center; font-weight:600; font-size:.66rem; color:var(--text-muted);
+    background:var(--surface-muted); padding:.35rem 0; border-radius:.5rem; margin-bottom:.3rem;
+  }
+  .grid-week{ margin-bottom:.22rem; }
+  .grid-cell{
+    min-height:5.6rem; border-radius:.55rem; border:1px solid var(--border);
+    padding:.3rem .2rem; background:var(--surface); overflow:hidden;
+  }
+  .grid-cell.blank{ background:transparent; border-color:transparent; }
+  .grid-date{ font-weight:700; font-size:.7rem; margin-bottom:.2rem; padding-left:.05rem; }
+  .grid-period{
+    display:flex; align-items:baseline; gap:.1rem;
+    font-size:.6rem; line-height:1.5; white-space:nowrap; padding-left:.05rem;
+  }
+  .grid-period .p{ color:var(--text-muted); font-size:.58rem; flex:none; }
+  .grid-period .code{ font-weight:600; overflow:hidden; text-overflow:ellipsis; }
+  .grid-period .period-star{ flex:none; }
+  .grid-empty{ font-size:.6rem; color:var(--text-muted); padding-left:.05rem; }
+
+  @media (min-width:480px){
+    .weekday-header, .grid-week{ grid-template-columns:repeat(5, minmax(70px, 1fr)); gap:.45rem; }
+    .grid-cell{ min-height:6.4rem; padding:.45rem .4rem; }
+    .grid-date{ font-size:.85rem; }
+    .grid-period{ font-size:.72rem; }
+    .grid-period .p{ font-size:.66rem; }
+  }
+
+  @media print{
+    @page{ size:A4 landscape; margin:6mm; }
+    body{ background:#fff !important; }
+    .no-print{ display:none !important; }
+    .grid-scroller{ overflow:visible !important; border:none !important; box-shadow:none !important; padding:0 !important; }
+    .weekday-header, .grid-week{ min-width:0 !important; }
+    main{ padding:0 !important; }
+    #app{ max-width:none !important; padding-bottom:0 !important; }
+  }
+</style>
+
+<div id="app">
+  <div class="appbar">
+    <div>
+      <h1>서은지 선생님 수업 시간표</h1>
+      <p id="month-summary">월을 선택하세요</p>
+    </div>
+    <button class="print-btn no-print" onclick="window.print()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+      인쇄
+    </button>
+  </div>
+
+  <div class="tabs no-print" id="tabs"></div>
+
+  <main>
+    <div class="grid-scroller">
+      <div id="grid-view"></div>
+    </div>
+  </main>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:var(--grade1)"></span>1학년</div>
+    <div class="legend-item"><span class="dot" style="background:var(--grade5)"></span>5학년</div>
+    <div class="legend-item"><span class="dot" style="background:var(--grade6)"></span>6학년</div>
+    <div class="legend-item"><span class="period-star">★</span>보강·보결·변경</div>
+    <div class="legend-note">앞의 숫자는 교시입니다</div>
+  </div>
+</div>
+
+<script>
+  const WEEKDAYS = ["월","화","수","목","금"];
+
+  const calendarData = {
+    9: {
+      title: "서은지 선생님 · 9월 39차시",
+      weeks: [
+        [
+          { date: 31, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 1, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 2, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 3, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 4, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 7, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 8, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 9, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 10, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 11, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 14, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 15, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 16, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 17, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 18, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 21, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:4, g:5, t:"5-8", star:true}, {p:5, g:6, t:"6-7"}] },
+          { date: 22, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}, {p:4, g:5, t:"5-6", star:true}, {p:5, g:6, t:"6-8", star:true}] },
+          { date: 23, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}, {p:4, g:6, t:"6-9", star:true}, {p:5, g:6, t:"6-3", star:true}] },
+          { date: 24, classes: [] },
+          { date: 25, classes: [] }
+        ],
+        [
+          { date: 28, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 29, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 30, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: null }, { date: null }
+        ]
+      ]
+    },
+    10: {
+      title: "서은지 선생님 · 10월 61차시",
+      weeks: [
+        [
+          { date: null }, { date: null }, { date: null },
+          { date: 1, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 2, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 5, classes: [] },
+          { date: 6, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}, {p:4, g:5, t:"5-6", star:true}] },
+          { date: 7, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}, {p:4, g:6, t:"6-3", star:true}, {p:5, g:5, t:"5-4", star:true}] },
+          { date: 8, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}, {p:5, g:6, t:"6-7", star:true}] },
+          { date: 9, classes: [] }
+        ],
+        [
+          { date: 12, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 13, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}, {p:4, g:5, t:"5-6", star:true}] },
+          { date: 14, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}, {p:4, g:6, t:"6-3", star:true}] },
+          { date: 15, classes: [{p:1, g:5, t:"5-8", star:true}, {p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-7", star:true}] },
+          { date: 16, classes: [] }
+        ],
+        [
+          { date: 19, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 20, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 21, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 22, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 23, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 26, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 27, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 28, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 29, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 30, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ]
+      ]
+    },
+    11: {
+      title: "서은지 선생님 · 11월 59차시",
+      weeks: [
+        [
+          { date: 2, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 3, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 4, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 5, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 6, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 9, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 10, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 11, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 12, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 13, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 16, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 17, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 18, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 19, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 20, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 23, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 24, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 25, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 26, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 27, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 30, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: null }, { date: null }, { date: null }, { date: null }
+        ]
+      ]
+    },
+    12: {
+      title: "서은지 선생님 · 12월 39차시",
+      weeks: [
+        [
+          { date: null },
+          { date: 1, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}, {p:4, g:5, t:"5-6", star:true}] },
+          { date: 2, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}, {p:4, g:6, t:"6-3", star:true}] },
+          { date: 3, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 4, classes: [] }
+        ],
+        [
+          { date: 7, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 8, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 9, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 10, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 11, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 14, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 15, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
+          { date: 16, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
+          { date: 17, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}] },
+          { date: 18, classes: [{p:2, g:6, t:"6-3"}, {p:3, g:5, t:"5-6"}] }
+        ],
+        [
+          { date: 21, classes: [] }, { date: 22, classes: [] }, { date: 23, classes: [] }, { date: 24, classes: [] }, { date: 25, classes: [] }
+        ],
+        [
+          { date: 28, classes: [] }, { date: 29, classes: [] }, { date: 30, classes: [] }, { date: 31, classes: [] }, { date: null }
+        ]
+      ]
+    }
+  };
+
+  function gradeColorVar(g){
+    if (g === 1) return 'var(--grade1)';
+    if (g === 5) return 'var(--grade5)';
+    if (g === 6) return 'var(--grade6)';
+    return 'var(--text)';
+  }
+
+  function renderGrid(month, data){
+    const el = document.getElementById('grid-view');
+    const header = `<div class="weekday-header">${WEEKDAYS.map(w => `<div>${w}</div>`).join('')}</div>`;
+    const weeks = data.weeks.map(week => {
+      const cells = week.map(d => {
+        if (d.date === null) return `<div class="grid-cell blank"></div>`;
+        const classes = d.classes || [];
+        const byPeriod = {};
+        classes.forEach(c => { byPeriod[c.p] = c; });
+        const maxP = classes.length ? Math.max(...classes.map(c => c.p)) : 0;
+        let periods = '';
+        for (let p = 1; p <= maxP; p++){
+          const c = byPeriod[p];
+          periods += c ? `
+              <div class="grid-period">
+                <span class="p mono">${c.p}</span>
+                <span class="code" style="color:${gradeColorVar(c.g)}">${c.t}</span>
+                ${c.star ? '<span class="period-star">★</span>' : ''}
+              </div>
+            ` : '<div class="grid-period grid-period-blank">&nbsp;</div>';
+        }
+        return `
+          <div class="grid-cell">
+            <div class="grid-date mono">${d.date}</div>
+            ${periods}
+          </div>
+        `;
+      }).join('');
+      return `<div class="grid-week">${cells}</div>`;
+    }).join('');
+    el.innerHTML = header + weeks;
+  }
+
+  function changeMonth(month){
+    [9, 10, 11, 12].forEach(m => {
+      document.getElementById(`tab-${m}`).classList.toggle('active', m === month);
+    });
+    const data = calendarData[month];
+    document.getElementById('month-summary').innerText = data.title;
+    renderGrid(month, data);
+  }
+
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = [9,10,11,12].map(m => `<button class="tab" id="tab-${m}" onclick="changeMonth(${m})">${m}월</button>`).join('');
+
+  changeMonth(9);
+</script>
