@@ -259,11 +259,11 @@
           { date: 12, classes: [{p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
           { date: 13, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}, {p:4, g:5, t:"5-6", star:true}] },
           { date: 14, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}, {p:4, g:6, t:"6-3", star:true}] },
-          { date: 15, classes: [{p:1, g:5, t:"5-8", star:true}, {p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-7", star:true}] },
+          { date: 15, classes: [{p:1, g:5, t:"5-8", star:true}, {p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-7", star:true, lesson:6}] },
           { date: 16, classes: [] }
         ],
         [
-          { date: 19, classes: [{p:2, g:5, t:"5-7"}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
+          { date: 19, classes: [{p:2, g:5, t:"5-7", lesson:7}, {p:3, g:5, t:"5-4"}, {p:5, g:6, t:"6-7"}] },
           { date: 20, classes: [{p:1, g:1, t:"1-5"}, {p:2, g:1, t:"1-6"}, {p:3, g:5, t:"5-5"}] },
           { date: 21, classes: [{p:1, g:1, t:"1-8"}, {p:2, g:1, t:"1-7"}, {p:3, g:6, t:"6-10"}] },
           { date: 22, classes: [{p:2, g:6, t:"6-8"}, {p:3, g:6, t:"6-9"}, {p:4, g:5, t:"5-8"}, {p:5, g:5, t:"5-7", star:true}] },
@@ -390,7 +390,7 @@
           periods += c ? `
               <div class="grid-period">
                 <span class="p mono">${c.p}</span>
-                <span class="code" style="color:${gradeColorVar(c.g)}"><span>${c.t}</span><span>(${lessonNumber(month, d.date)})</span></span>
+                <span class="code" style="color:${gradeColorVar(c.g)}"><span>${c.t}</span><span>(${c.lesson ?? lessonNumber(month, d.date)})</span></span>
                 ${c.star ? '<span class="period-star">★</span>' : ''}
               </div>
             ` : '<div class="grid-period grid-period-blank">&nbsp;</div>';
